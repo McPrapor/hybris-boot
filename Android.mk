@@ -146,7 +146,7 @@ $(LOCAL_BUILT_MODULE): $(INSTALLED_KERNEL_TARGET) $(BOOT_RAMDISK) $(MKBOOTIMG) $
 	@echo "Making hybris-boot.img in $(dir $@) using $(INSTALLED_KERNEL_TARGET) $(BOOT_RAMDISK)"
 	@mkdir -p $(dir $@)
 	@rm -rf $@
-	$(hide) python $(MKELF) -o $@ $(INSTALLED_KERNEL_TARGET)@0x80208000 $(BOOT_INTERMEDIATE)/boot-initramfs.gz@0x81900000,ramdisk $(DEVICE_RPMBIN)@0x00020000,rpm $(DEVICE_CMDLINE)@cmdline
+	$(hide) python $(MKELF) -o $@ $(INSTALLED_KERNEL_TARGET)@0x80208000 $(BOOT_RAMDISK)@0x81900000,ramdisk $(DEVICE_RPMBIN)@0x00020000,rpm $(DEVICE_CMDLINE)@cmdline
 #	$(hide)$(MKBOOTIMG) --ramdisk $(BOOT_RAMDISK) $(HYBRIS_BOOTIMAGE_ARGS) $(BOARD_MKBOOTIMG_ARGS) --output $@
 
 $(BOOT_RAMDISK): $(BOOT_RAMDISK_FILES) $(BB_STATIC)
@@ -160,7 +160,7 @@ $(BOOT_RAMDISK): $(BOOT_RAMDISK_FILES) $(BB_STATIC)
 	@cp $(BB_STATIC) $(BOOT_INTERMEDIATE)/initramfs/bin/
 	@cp $(DEVICE_LOGORLE) $(BOOT_INTERMEDIATE)/initramfs/
 	@echo $(HYBRIS_BOARD_KERNEL_CMDLINE) > $(BOOT_INTERMEDIATE)/initramfs/cmdline.txt
-	@echo $(DEVICE_CMDLINE) >> $(BOOT_INTERMEDIATE)/initramfs/cmdline.txt
+	@cat $(DEVICE_CMDLINE) >> $(BOOT_INTERMEDIATE)/initramfs/cmdline.txt
 	@echo $(HYBRIS_BOOTIMAGE_ARGS) >> $(BOOT_INTERMEDIATE)/initramfs/bootimageargs.txt
 	@echo $(BOARD_MKBOOTIMG_ARGS) >> $(BOOT_INTERMEDIATE)/initramfs/boardmkbootimgargs.txt
 	
@@ -196,7 +196,8 @@ $(LOCAL_BUILT_MODULE): $(INSTALLED_KERNEL_TARGET) $(RECOVERY_RAMDISK) $(MKBOOTIM
 	@echo "Making hybris-recovery.img in $(dir $@) using $(INSTALLED_KERNEL_TARGET) $(RECOVERY_RAMDISK)"
 	@mkdir -p $(dir $@)
 	@rm -rf $@
-	$(hide)$(MKBOOTIMG) --ramdisk $(RECOVERY_RAMDISK) $(HYBRIS_RECOVERYIMAGE_ARGS) $(BOARD_MKRECOVERYIMG_ARGS) --output $@
+	$(hide) python $(MKELF) -o $@ $(INSTALLED_KERNEL_TARGET)@0x80208000 $(RECOVERY_RAMDISK)@0x81900000,ramdisk $(DEVICE_RPMBIN)@0x00020000,rpm $(DEVICE_CMDLINE)@cmdline
+#	$(hide)$(MKBOOTIMG) --ramdisk $(RECOVERY_RAMDISK) $(HYBRIS_RECOVERYIMAGE_ARGS) $(BOARD_MKRECOVERYIMG_ARGS) --output $@
 
 $(RECOVERY_RAMDISK): $(RECOVERY_RAMDISK_FILES) $(BB_STATIC)
 	@echo "Making initramfs : $@"
@@ -205,6 +206,11 @@ $(RECOVERY_RAMDISK): $(RECOVERY_RAMDISK_FILES) $(BB_STATIC)
 	@cp -a $(RECOVERY_RAMDISK_SRC)/*  $(RECOVERY_INTERMEDIATE)/initramfs
 	@mv $(RECOVERY_RAMDISK_INIT) $(RECOVERY_INTERMEDIATE)/initramfs/init
 	@cp $(BB_STATIC) $(RECOVERY_INTERMEDIATE)/initramfs/bin/
+	@cp $(DEVICE_LOGORLE) $(RECOVERY_INTERMEDIATE)/initramfs/
+	@echo $(HYBRIS_BOARD_KERNEL_CMDLINE) > $(RECOVERY_INTERMEDIATE)/initramfs/cmdline.txt
+	@cat $(DEVICE_CMDLINE) >> $(RECOVERY_INTERMEDIATE)/initramfs/cmdline.txt
+	@echo $(HYBRIS_BOOTIMAGE_ARGS) >> $(RECOVERY_INTERMEDIATE)/initramfs/bootimageargs.txt
+	@echo $(BOARD_MKBOOTIMG_ARGS) >> $(RECOVERY_INTERMEDIATE)/initramfs/boardmkbootimgargs.txt
 	@(cd $(RECOVERY_INTERMEDIATE)/initramfs && find . | cpio -H newc -o ) | gzip -9 > $@
 
 $(RECOVERY_RAMDISK_INIT): $(RECOVERY_RAMDISK_INIT_SRC) $(ALL_PREBUILT)
