@@ -18,6 +18,15 @@
 LOCAL_PATH:= $(call my-dir)
 HYBRIS_PATH:=$(LOCAL_PATH)
 
+# Device specific paths
+
+DEVICE_BOOTDIR := device/sony/blue-common/boot
+MKELF := $(DEVICE_BOOTDIR)/mkelf.py
+
+DEVICE_LOGORLE := $(DEVICE_BOOTDIR)/logo.rle
+DEVICE_RPMBIN := vendor/sony/blue-common/proprietary/boot/RPM.bin
+#DEVICE_CMDLINE := $(DEVICE_BOOTDIR)/cmdline.txt
+
 # We use the commandline and kernel configuration varables from
 # build/core/Makefile to be consistent. Support for boot/recovery
 # image specific kernel COMMANDLINE vars is provided but whether it
@@ -137,7 +146,8 @@ $(LOCAL_BUILT_MODULE): $(INSTALLED_KERNEL_TARGET) $(BOOT_RAMDISK) $(MKBOOTIMG) $
 	@echo "Making hybris-boot.img in $(dir $@) using $(INSTALLED_KERNEL_TARGET) $(BOOT_RAMDISK)"
 	@mkdir -p $(dir $@)
 	@rm -rf $@
-	$(hide)$(MKBOOTIMG) --ramdisk $(BOOT_RAMDISK) $(HYBRIS_BOOTIMAGE_ARGS) $(BOARD_MKBOOTIMG_ARGS) --output $@
+	$(hide) python $(MKELF) -o $@ $(INSTALLED_KERNEL_TARGET)@0x80208000 $(BOOT_INTERMEDIATE)/boot-initramfs.gz@0x81900000,ramdisk $(DEVICE_RPMBIN)@0x00020000,rpm $(DEVICE_CMDLINE)@cmdline
+#	$(hide)$(MKBOOTIMG) --ramdisk $(BOOT_RAMDISK) $(HYBRIS_BOOTIMAGE_ARGS) $(BOARD_MKBOOTIMG_ARGS) --output $@
 
 $(BOOT_RAMDISK): $(BOOT_RAMDISK_FILES) $(BB_STATIC)
 	@echo "Making initramfs : $@"
@@ -148,6 +158,12 @@ $(BOOT_RAMDISK): $(BOOT_RAMDISK_FILES) $(BB_STATIC)
 # really hard to depend on things which may affect init.
 	@mv $(BOOT_RAMDISK_INIT) $(BOOT_INTERMEDIATE)/initramfs/init
 	@cp $(BB_STATIC) $(BOOT_INTERMEDIATE)/initramfs/bin/
+	@cp $(DEVICE_LOGORLE) $(BOOT_INTERMEDIATE)/initramfs/
+	@echo $(HYBRIS_BOARD_KERNEL_CMDLINE) > $(BOOT_INTERMEDIATE)/initramfs/cmdline.txt
+	@echo $(DEVICE_CMDLINE) >> $(BOOT_INTERMEDIATE)/initramfs/cmdline.txt
+	@echo $(HYBRIS_BOOTIMAGE_ARGS) >> $(BOOT_INTERMEDIATE)/initramfs/bootimageargs.txt
+	@echo $(BOARD_MKBOOTIMG_ARGS) >> $(BOOT_INTERMEDIATE)/initramfs/boardmkbootimgargs.txt
+	
 	@(cd $(BOOT_INTERMEDIATE)/initramfs && find . | cpio -H newc -o ) | gzip -9 > $@
 
 $(BOOT_RAMDISK_INIT): $(BOOT_RAMDISK_INIT_SRC) $(ALL_PREBUILT)
