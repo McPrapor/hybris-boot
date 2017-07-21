@@ -581,6 +581,40 @@ case "$DEVICE" in
             -e 's block/bootdevice/by-name/userdata mmcblk0p23 ' \
             "$@"
         ;;
+    "tsubasa")
+        sed -i \
+            -e 's block/platform/msm_sdcc.1/by-name/Boot mmcblk0p2 ' \
+            -e 's block/platform/msm_sdcc.1/by-name/Boot2 mmcblk0p3 ' \
+            -e 's block/platform/msm_sdcc.1/by-name/Cache mmcblk0p13 ' \
+            -e 's block/platform/msm_sdcc.1/by-name/FOTAKernel mmcblk0p11 ' \
+            -e 's block/platform/msm_sdcc.1/by-name/Kernel mmcblk0p4 ' \
+            -e 's block/platform/msm_sdcc.1/by-name/SDCard mmcblk0p15 ' \
+            -e 's block/platform/msm_sdcc.1/by-name/System mmcblk0p12 ' \
+            -e 's block/platform/msm_sdcc.1/by-name/TA mmcblk0p1 ' \
+            -e 's block/platform/msm_sdcc.1/by-name/TZ mmcblk0p5 ' \
+            -e 's block/platform/msm_sdcc.1/by-name/Userdata mmcblk0p14 ' \
+            -e 's block/platform/msm_sdcc.1/by-name/apps_log mmcblk0p10 ' \
+            -e 's block/platform/msm_sdcc.1/by-name/fsg mmcblk0p8 ' \
+            -e 's block/platform/msm_sdcc.1/by-name/modemst1 mmcblk0p6 ' \
+            -e 's block/platform/msm_sdcc.1/by-name/modemst2 mmcblk0p7 ' \
+            -e 's block/platform/msm_sdcc.1/by-name/ramdump mmcblk0p9 ' \
+            -e 's block/bootdevice/by-name/Boot mmcblk0p2 ' \
+            -e 's block/bootdevice/by-name/Boot2 mmcblk0p3 ' \
+            -e 's block/bootdevice/by-name/Cache mmcblk0p13 ' \
+            -e 's block/bootdevice/by-name/FOTAKernel mmcblk0p11 ' \
+            -e 's block/bootdevice/by-name/Kernel mmcblk0p4 ' \
+            -e 's block/bootdevice/by-name/SDCard mmcblk0p15 ' \
+            -e 's block/bootdevice/by-name/System mmcblk0p12 ' \
+            -e 's block/bootdevice/by-name/TA mmcblk0p1 ' \
+            -e 's block/bootdevice/by-name/TZ mmcblk0p5 ' \
+            -e 's block/bootdevice/by-name/Userdata mmcblk0p14 ' \
+            -e 's block/bootdevice/by-name/apps_log mmcblk0p10 ' \
+            -e 's block/bootdevice/by-name/fsg mmcblk0p8 ' \
+            -e 's block/bootdevice/by-name/modemst1 mmcblk0p6 ' \
+            -e 's block/bootdevice/by-name/modemst2 mmcblk0p7 ' \
+            -e 's block/bootdevice/by-name/ramdump mmcblk0p9 ' \
+            "$@"
+        ;;
     *)
 	cat <<EOF
 
